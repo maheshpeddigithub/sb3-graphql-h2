@@ -6,9 +6,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
+@AllArgsConstructor
 @Entity
 @Table
 public class Author {
@@ -23,4 +27,7 @@ public class Author {
     @Column(name = "age")
     private Integer age;
 
+    public Author(Long authorId) {
+        this.id = authorId;
+    }
 }
