@@ -1,42 +1,50 @@
 package com.ssil.sb3.graphql.h2.controller;
 
 import com.ssil.sb3.graphql.h2.model.Tutorial;
-import com.ssil.sb3.graphql.h2.service.TutorialService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.ssil.sb3.graphql.h2.repository.AuthorRepository;
+import com.ssil.sb3.graphql.h2.repository.TutorialRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.stereotype.Controller;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/api/tutorial")
+@Controller
 public class TutorialController {
 
-    public TutorialController(TutorialService service) {
-        this.service = service;
+    @Autowired
+    private AuthorRepository authorRepository;
+
+    @Autowired
+    private TutorialRepository tutorialRepository;
+
+    @QueryMapping
+    public List<Tutorial> findAllTutorials() {
+        return tutorialRepository.findAll();
     }
 
-    @GetMapping
-    public ResponseEntity<List<Tutorial>> getTutorials() {
-        return new ResponseEntity<>(service.getTutorials(), HttpStatus.OK);
+    @MutationMapping
+    public Tutorial createTutorial(@Argument String title, @Argument String description, @Argument Integer author) {
+        Tutorial tutorial = Tutorial.builder().title(title).description(description).author(authorRepository.findById(Long.valueOf(author)).orElse(null)).build();
+        tutorialRepository.save(tutorial);
+        return tutorial;
     }
 
-    @PostMapping
-    public ResponseEntity<Tutorial> createTutorial(@RequestBody Tutorial tutorial) {
-        return new ResponseEntity<>(service.createTutorial(tutorial), HttpStatus.CREATED);
+    @MutationMapping
+    public Tutorial updateTutorial(@Argument Integer id, @Argument String title, @Argument String description) {
+        Tutorial tutorial = tutorialRepository.findById(Long.valueOf(id)).orElse(null);
+        tutorial.setTitle(title);
+        tutorial.setDescription(description);
+        tutorialRepository.save(tutorial);
+        return tutorial;
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity deleteTutorial(@PathVariable Long id) {
-        service.deleteTutorial(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    @MutationMapping
+    public Boolean deleteTutorial(@Argument Integer id) {
+        tutorialRepository.deleteById(Long.valueOf(id));
+        return true;
     }
 
-    private TutorialService service;
 }

@@ -7,7 +7,6 @@ type Tutorial {
 
 extend type Query {
 	findAllTutorials: [Tutorial]!
-	countTutorials: Int!
 }
 
 extend type Mutation {

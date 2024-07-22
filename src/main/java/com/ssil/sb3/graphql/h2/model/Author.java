@@ -9,10 +9,12 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table
 public class Author {
@@ -26,8 +28,4 @@ public class Author {
 
     @Column(name = "age")
     private Integer age;
-
-    public Author(Long authorId) {
-        this.id = authorId;
-    }
 }
